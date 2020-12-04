@@ -3,16 +3,9 @@ import { Text, FlatList, ActivityIndicator } from 'react-native'
 import { View, Right, Body, List, ListItem, Left, Thumbnail, Icon, Separator, Input } from 'native-base'
 import { connect } from 'react-redux'
 
-class ContactsView extends Component {
-  constructor () {
-    super()
-    this.state = {
-      isLoading: false,
-      contactsDisplayed: [],
-      contacts: []
-    }
-  }
+import { loadContacts } from "../store/actions/contactActions";
 
+class ContactsView extends Component {
   static navigationOptions = {
     title: 'Home',
     headerTintColor: 'white',
@@ -21,20 +14,20 @@ class ContactsView extends Component {
     }
   }
 
-  componentDidMount () {
-    this.setState({ isLoading: true })
-    this.loadContacts()
-  }
+  async componentDidMount () {
+    const { dispatch } = this.props
 
-  loadContacts = async () => {
-    const { contacts } = this.props
-    this.setState({ contacts: contacts, contactsDisplayed: contacts, isLoading: false })
+    await dispatch(loadContacts())
   }
 
   searchContacts = filter => {
+    const { dispatch } = this.props
+
     const filteredContacts = this.state.contacts.filter(
       contact => (contact.name.toLowerCase()).indexOf(filter.toLowerCase()) > -1)
     this.setState({ contactsDisplayed: filteredContacts })
+
+    dispatch(filterList({ filter }))
   }
 
   renderItem = ({ item }) => {
@@ -65,8 +58,7 @@ class ContactsView extends Component {
   )
 
   render () {
-    const { navigation: { navigate } } = this.props
-    const { contactsDisplayed } = this.state
+    const { navigation: { navigate }, filterdContacts } = this.props
 
     return (
       <List>
@@ -105,7 +97,7 @@ class ContactsView extends Component {
         </ListItem>
         <Separator bordered />
         {
-          this.state.isLoading
+          this.props.isLoading
             ? (
                 <View>
                   <ActivityIndicator size="large" color="#bad555" />
@@ -113,7 +105,7 @@ class ContactsView extends Component {
               )
             : (
                 <FlatList
-                  data={contactsDisplayed}
+                  data={filterdContacts}
                   renderItem={this.renderItem}
                   keyExtractor={(item, index) => item.id}
                   ListEmptyComponent={this.listEmptyComponent}
@@ -127,7 +119,9 @@ class ContactsView extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    contacts: state.contactReducer.contactList
+    contacts: state.contactReducer.contactList,
+    filterdContacts: state.contactReducer.contactListFiltered,
+    isLoading: state.contactReducer.isLoading
   }
 }
 
