@@ -47,7 +47,7 @@ class ContactsView extends Component {
           <Thumbnail source={{ uri: photo }} />
         </Left>
         <Body>
-          <Text>{id} {name}</Text>
+          <Text>{name}</Text>
         </Body>
         <Right>
           <Icon name="arrow-forward" />
@@ -65,8 +65,6 @@ class ContactsView extends Component {
   )
 
   render () {
-    console.log(this.state)
-    console.log(this.props)
     const { navigation: { navigate } } = this.props
     const { contactsDisplayed } = this.state
 
@@ -94,6 +92,17 @@ class ContactsView extends Component {
             <Icon name="arrow-forward" />
           </Right>
         </ListItem>
+        <ListItem icon onPress={() => null}>
+          <Left>
+            <Icon name="document" />
+          </Left>
+          <Body>
+            <Text>Import contacts</Text>
+          </Body>
+          <Right>
+            <Icon name="arrow-forward" />
+          </Right>
+        </ListItem>
         <Separator bordered />
         {
           this.state.isLoading
@@ -106,7 +115,7 @@ class ContactsView extends Component {
                 <FlatList
                   data={contactsDisplayed}
                   renderItem={this.renderItem}
-                  keyExtractor={(item, index) => index.toString()}
+                  keyExtractor={(item, index) => item.id}
                   ListEmptyComponent={this.listEmptyComponent}
                 />
               )
