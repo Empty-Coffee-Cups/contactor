@@ -1,11 +1,11 @@
 import { createAppContainer } from 'react-navigation'
 import { createStackNavigator } from 'react-navigation-stack'
 
-import Contacts from '../views/contactsView'
+import ContactsView from '../views/contactsView'
 
 const StackNavigator = createStackNavigator(
   {
-    Contacts
+    Contacts: ContactsView
   }
 )
 

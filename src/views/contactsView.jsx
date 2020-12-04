@@ -1,78 +1,125 @@
-import React from 'react'
-import { View, Linking, ScrollView, Platform } from 'react-native'
-import { Container, Icon, Fab, List } from 'native-base'
-import { useNavigation } from 'react-navigation-hooks'
-import { useSelector, useDispatch } from 'react-redux'
-import { ListItem } from 'react-native-elements'
+import React, { Component } from 'react'
+import { Text, FlatList, ActivityIndicator } from 'react-native'
+import { View, Right, Body, List, ListItem, Left, Thumbnail, Icon, Separator, Input } from 'native-base'
+import { connect } from 'react-redux'
 
-// Actions
-import { disableLoadingScreenAction } from '../../actions/loadingScreenAction'
-
-// Service
-import * as service from '../../service'
-// Components
-import Search from '../../components/Search'
-import Upsert from '../../components/Upsert'
-import SettingsMenu from '../../components/SettingsMenu'
-
-const Contacts = () => {
-  const { navigate } = useNavigation()
-  const dispatch = useDispatch()
-
-  const contacts = useSelector((state) => state.contacts)
-  const searchPara = useSelector((state) => state.searchPara)
-  const contactListisEmpty = useSelector((state) => state.contactListEmpty)
-  const loadingScreen = useSelector((state) => state.loadingScreen)
-
-  // If our contact list is empty and our list is empty
-  if (contactListisEmpty && loadingScreen) {
-    dispatch(disableLoadingScreenAction())
-  }
-
-  const callHandler = (phoneNumber) => {
-    // If not android we use telepromt else tel for every other phone
-    if (Platform.OS !== 'android') {
-      Linking.openURL(`telprompt:${phoneNumber}`)
-    } else {
-      Linking.openURL(`tel:${phoneNumber}`)
+class ContactsView extends Component {
+  constructor () {
+    super()
+    this.state = {
+      isLoading: false,
+      contactsDisplayed: [],
+      contacts: []
     }
   }
 
-  return (
-    <Container>
-      {/*
-      <View style={styles.searchAndSettings}>
-        <Search />
-        <SettingsMenu />
-      </View>
-      */}
-      <ScrollView style={styles.container}>
-        {
-          contacts.filter((x) => x.name.toLowerCase().includes(
-            searchPara.toLowerCase()
-          )).map((item) => (
-            <ListItem
-              containerStyle={styles.contentContainer}
-              titleStyle={styles.title}
-              key={item.id}
-              title={item.name}
-              leftAvatar={!service.isEmpty(item.image)
-                ? ({ source: { uri: `data:image/jpeg;base64,${item.image}` } })
-                : ({ source: { uri: 'https://icon-library.net/images/default-profile-icon/default-profile-icon-24.jpg' } }
-                  )}
-              onPress={() => navigate('ContactsDetailed', { id: item.id })}
-              bottomDivider
-              chevron={styles.title}
-              rightIcon={{
-                reverse: true, name: 'phone', type: 'antdesign', color: 'green', onPress: () => callHandler(item.phoneNumber),
-              }}
-            />
-          ))
-        }
-      </ScrollView>
-      <Upsert user={{}} title="Create a contact" buttonName="Add Contact" />
-    </Container>
+  static navigationOptions = {
+    title: 'Home',
+    headerTintColor: 'white',
+    headerStyle: {
+      backgroundColor: '#845cc3'
+    }
+  }
+
+  componentDidMount () {
+    this.setState({ isLoading: true })
+    this.loadContacts()
+  }
+
+  loadContacts = async () => {
+    const { contacts } = this.props
+    this.setState({ contacts: contacts, contactsDisplayed: contacts, isLoading: false })
+  }
+
+  searchContacts = filter => {
+    const filteredContacts = this.state.contacts.filter(
+      contact => (contact.name.toLowerCase()).indexOf(filter.toLowerCase()) > -1)
+    this.setState({ contactsDisplayed: filteredContacts })
+  }
+
+  renderItem = ({ item }) => {
+    const { id, name, photo } = item
+    const { navigation: { navigate } } = this.props
+
+    return (
+      <ListItem thumbnail onPress={() => navigate('ContactDetails', { item })}>
+        <Left>
+          <Thumbnail source={{ uri: photo }} />
+        </Left>
+        <Body>
+          <Text>{id} {name}</Text>
+        </Body>
+        <Right>
+          <Icon name="arrow-forward" />
+        </Right>
+      </ListItem>
+    )
+  }
+
+  listEmptyComponent = () => (
+    <ListItem>
+      <Body>
+        <Text>No contacts found</Text>
+      </Body>
+    </ListItem>
   )
+
+  render () {
+    console.log(this.state)
+    console.log(this.props)
+    const { navigation: { navigate } } = this.props
+    const { contactsDisplayed } = this.state
+
+    return (
+      <List>
+        <ListItem icon>
+          <Left>
+            <Icon name="search" />
+          </Left>
+          <Body>
+            <Input
+              placeholder="Search"
+              onChangeText={value => this.searchContacts(value)}
+            />
+          </Body>
+        </ListItem>
+        <ListItem icon onPress={() => navigate('AddContact')}>
+          <Left>
+            <Icon name="person-add" />
+          </Left>
+          <Body>
+            <Text>Add contact</Text>
+          </Body>
+          <Right>
+            <Icon name="arrow-forward" />
+          </Right>
+        </ListItem>
+        <Separator bordered />
+        {
+          this.state.isLoading
+            ? (
+                <View>
+                  <ActivityIndicator size="large" color="#bad555" />
+                </View>
+              )
+            : (
+                <FlatList
+                  data={contactsDisplayed}
+                  renderItem={this.renderItem}
+                  keyExtractor={(item, index) => index.toString()}
+                  ListEmptyComponent={this.listEmptyComponent}
+                />
+              )
+        }
+      </List>
+    )
+  }
 }
 
-export default Contacts
+const mapStateToProps = (state) => {
+  return {
+    contacts: state.contactReducer.contactList
+  }
+}
+
+export default connect(mapStateToProps)(ContactsView)
