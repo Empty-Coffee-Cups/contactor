@@ -3,7 +3,7 @@ import { Text, FlatList, ActivityIndicator } from 'react-native'
 import { View, Right, Body, List, ListItem, Left, Thumbnail, Icon, Separator, Input } from 'native-base'
 import { connect } from 'react-redux'
 
-import { loadContacts } from "../store/actions/contactActions";
+import { loadContacts, updateFilter } from "../store/actions/contactActions";
 
 class ContactsView extends Component {
   static navigationOptions = {
@@ -20,7 +20,7 @@ class ContactsView extends Component {
     await dispatch(loadContacts())
   }
 
-  searchContacts = filter => {
+  searchContacts = (filter) => {
     const { dispatch } = this.props
 
     const filteredContacts = this.state.contacts.filter(
@@ -58,7 +58,7 @@ class ContactsView extends Component {
   )
 
   render () {
-    const { navigation: { navigate }, filterdContacts } = this.props
+    const { navigation: { navigate }, contacts } = this.props
 
     return (
       <List>
@@ -69,7 +69,8 @@ class ContactsView extends Component {
           <Body>
             <Input
               placeholder="Search"
-              onChangeText={value => this.searchContacts(value)}
+              value={this.props.filter}
+              onChangeText={(value) => this.props.dispatch(updateFilter(value))}
             />
           </Body>
         </ListItem>
@@ -95,7 +96,7 @@ class ContactsView extends Component {
             <Icon name="arrow-forward" />
           </Right>
         </ListItem>
-        <Separator bordered />
+        <Separator bordered><Text>{this.props.filter}</Text></Separator>
         {
           this.props.isLoading
             ? (
@@ -105,7 +106,7 @@ class ContactsView extends Component {
               )
             : (
                 <FlatList
-                  data={filterdContacts}
+                  data={contacts}
                   renderItem={this.renderItem}
                   keyExtractor={(item, index) => item.id}
                   ListEmptyComponent={this.listEmptyComponent}
@@ -117,10 +118,14 @@ class ContactsView extends Component {
   }
 }
 
+const getFilteredContacts = (contacts, filter) => {
+  return contacts.filter(contact => (contact.name.toLowerCase()).indexOf(filter.toLowerCase()) > -1).sort((a, b) => a.name.localeCompare(b.name))
+}
+
 const mapStateToProps = (state) => {
   return {
-    contacts: state.contactReducer.contactList,
-    filterdContacts: state.contactReducer.contactListFiltered,
+    contacts: getFilteredContacts(state.contactReducer.contactList, state.contactReducer.filter),
+    filter: state.contactReducer.filter,
     isLoading: state.contactReducer.isLoading
   }
 }

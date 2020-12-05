@@ -37,6 +37,7 @@ export const ADD_CONTACT = 'ADD_CONTACT'
 export const LOAD_START = 'LOAD_CONTACTS_START'
 export const LOAD_CONTACTS_DONE = 'LOAD_CONTACTS_DONE'
 export const LOAD_DONE = 'LOAD_CONTACTS_DONE'
+export const UPDATE_FILTER = 'UPDATE_FILTER'
 
 export const addContact = (contact) => (
   {
@@ -61,5 +62,12 @@ export const loadContactsDone = (contacts) => (
 export const loadDone = () => (
   {
     type: LOAD_DONE
+  }
+)
+
+export const updateFilter = (filter) => (
+  {
+    type: UPDATE_FILTER,
+    payload: filter
   }
 )
