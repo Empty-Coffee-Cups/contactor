@@ -1,7 +1,7 @@
 import React from 'react'
 import { View } from 'react-native'
-import Addcontact from '../components/Add_contact'
-import * as importContacts from '../../services/importContacts'
+import Addcontacts from '../components/Add_contact'
+import * as importContacts from '../services/importContacts'
 
 class AddContact extends React.Component {
   constructor (props) {
@@ -24,7 +24,7 @@ class AddContact extends React.Component {
 
   submit_function = (object) => {
     const { action_type, contact_obj } = this.state
-    if (action_type === 'Addcontact') {
+    if (action_type === 'ADD_CONTACT') {
       srcservicesfilename.editContact(contact_obj, object)
     }
     else {

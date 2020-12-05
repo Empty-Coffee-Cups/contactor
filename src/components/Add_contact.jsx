@@ -1,10 +1,9 @@
 import React from 'react'
 import {
   Veiw, TextInput, Button, Text, TouchableHighlight,
-  withNavigation, NavigationActions
+  withNavigation
 } from 'react-native'
-import { Icon } from 'react-native-elements'
-import { View } from 'native-base'
+import { View, Icon } from 'native-base'
 
 import Styles from './style'
 
