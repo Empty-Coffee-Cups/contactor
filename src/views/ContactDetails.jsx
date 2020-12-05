@@ -37,7 +37,8 @@ class ContactDetails extends Component {
   }
 
   render () {
-    const { id, name, photo } = item
+    const { navigation: { getParam } } = this.props
+    const { id, name, photo } = getParam('contact')
 
     return (
       <Container>
