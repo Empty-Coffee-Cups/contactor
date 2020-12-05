@@ -3,7 +3,7 @@ import { Text, FlatList, ActivityIndicator } from 'react-native'
 import { View, Right, Body, List, ListItem, Left, Thumbnail, Icon, Separator, Input } from 'native-base'
 import { connect } from 'react-redux'
 
-import { loadContacts, updateFilter } from "../store/actions/contactActions";
+import { loadContacts, updateFilter } from "../store/actions/contactActions"
 
 class ContactsView extends Component {
   static navigationOptions = {
@@ -31,11 +31,14 @@ class ContactsView extends Component {
   }
 
   renderItem = ({ item }) => {
-    const { id, name, photo } = item
+    const { name, photo } = item
     const { navigation: { navigate } } = this.props
 
     return (
-      <ListItem thumbnail onPress={() => navigate('ContactDetails', { item })}>
+      <ListItem thumbnail onPress={() => {
+        navigate('ContactDetails', { contact: item })
+      }}
+      >
         <Left>
           <Thumbnail source={{ uri: photo }} />
         </Left>
