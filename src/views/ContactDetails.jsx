@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { StyleSheet, Linking } from 'react-native'
 import { Input, Container, Header, Content, Thumbnail, Button, Text, View, Icon } from 'native-base'
 import { connect } from 'react-redux'
-import { selectFromCameraRoll, takePhoto } from '../services/ImagePickerService'
+import { selectFromCameraRoll, takePhoto } from '../services/imagePickerService'
 import {removeContact, createContact} from '../store/actions/contactActions'
 
 class ContactDetails extends Component {

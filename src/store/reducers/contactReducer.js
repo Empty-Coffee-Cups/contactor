@@ -15,7 +15,6 @@ const initialState = {
 }
 
 const contactReducer = (state = initialState, action) => {
-  console.log(action)
   switch (action.type) {
     case ADD_CONTACT: {
       const { id, name, phoneNumber, photo } = action.payload

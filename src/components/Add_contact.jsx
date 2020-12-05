@@ -1,7 +1,6 @@
 import React from 'react'
 import {
-  Veiw, TextInput, Button, Text, TouchableHighlight,
-  withNavigation
+  Veiw, TextInput, Button, Text, TouchableHighlight
 } from 'react-native'
 import { View, Icon } from 'native-base'
 
@@ -110,4 +109,4 @@ class Addcontact extends React.Component {
   }
 }
 
-export default withNavigation(Addcontact)
+export default Addcontact

@@ -33,13 +33,12 @@ class AddContact extends React.Component {
   }
 
   render () {
-    const { name } = this.props.navigation.state.params
     return (
       <View>
-        <AddContact _submit_function={this.submit_function} _ContactName={name} action_type={this.state.action_type} />
+        <AddContact _submit_function={this.submit_function} action_type={this.state.action_type} />
       </View>
     )
   }
 }
 
-export default AddContact;
+export default AddContact
