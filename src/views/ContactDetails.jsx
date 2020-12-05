@@ -42,7 +42,7 @@ class ContactDetails extends Component {
 
     return (
       <Container>
-        <Header/>
+
         <Content>
           <View style={styles.container}>
             <View style={styles.item}>
@@ -59,13 +59,13 @@ class ContactDetails extends Component {
               </Button>
             </View>
             <View style={styles.item}>
-              <Input regular placeholder={getParam('name')} style={styles.input} onChangeText={text => this.changeValue('name',text)} />
+              <Input regular placeholder={name} style={styles.input} onChangeText={text => this.changeValue('name',text)} />
             </View>
             <View style={styles.item}>
-                <Input placeholder={getParam('telephone')} style={styles.input} onChangeText={text => this.changeValue('phoneNumber',text)}/>
+                <Input placeholder={phoneNumber} style={styles.input} onChangeText={text => this.changeValue('phoneNumber',text)}/>
             </View>
             <View style={styles.item}>
-              <Button success large onPress={() => Linking.openURL(`tel:${getParam('phoneNumber')}`)} >
+              <Button success large onPress={()=> Linking.openURL(`tel:${getParam('phoneNumber')}`)} >
                 <Text>
                   Call
                 </Text>
@@ -75,16 +75,6 @@ class ContactDetails extends Component {
               <Button success large onPress={() => this.update()}>
                 <Text>
                   Save
-                </Text>
-              </Button>
-              <Button large block onPress={() => this.gallery()}>
-                <Text>
-                    Grab image
-                </Text>
-              </Button>
-              <Button large block success onPress={() => this.takePhoto()}>
-                <Text>
-                  Take photo
                 </Text>
               </Button>
             </View>
