@@ -3,7 +3,7 @@ import { StyleSheet, Linking } from 'react-native'
 import { Input, Container, Header, Content, Thumbnail, Button, Text, View, Icon } from 'native-base'
 import { connect } from 'react-redux'
 import { selectFromCameraRoll, takePhoto } from '../services/ImagePickerService'
-import * as FileServices from '../services/fileService'
+import {removeContact, createContact} from '../store/actions/contactActions'
 
 class ContactDetails extends Component {
   constructor () {
@@ -24,6 +24,9 @@ class ContactDetails extends Component {
 
   componentDidMount () {
     this.setState({ isLoading: true })
+    const { navigation: { getParam } } = this.props
+    const { id, name, photo, phoneNumber } = getParam('contact')
+    this.setState({id, name, photo, phoneNumber})
   }
 
   async gallery () {
@@ -34,6 +37,13 @@ class ContactDetails extends Component {
   async takePhoto () {
     const photo = await takePhoto()
     this.setState({ image:photo })
+  }
+
+  async update () {
+        const { id, name, phoneNumber, photo } = this.state;
+        const { dispatch } = this.params
+        await dispatch(removeContact(id))
+        await dispatch(createContact({name,phoneNumber, photo }))
   }
 
   render () {
@@ -59,13 +69,13 @@ class ContactDetails extends Component {
               </Button>
             </View>
             <View style={styles.item}>
-              <Input regular placeholder={name} style={styles.input} onChangeText={text => this.changeValue('name',text)} />
+              <Input regular value={this.state.name} style={styles.input} onChangeText={text => this.setState('name',text)} />
             </View>
             <View style={styles.item}>
-                <Input placeholder={phoneNumber} style={styles.input} onChangeText={text => this.changeValue('phoneNumber',text)}/>
+                <Input value={this.state.phoneNumber} style={styles.input} onChangeText={text => this.setState('phoneNumber',text)}/>
             </View>
             <View style={styles.item}>
-              <Button success large onPress={()=> Linking.openURL(`tel:${getParam('phoneNumber')}`)} >
+              <Button success large onPress={()=> Linking.openURL(`tel:${phoneNumber}`) } >
                 <Text>
                   Call
                 </Text>
