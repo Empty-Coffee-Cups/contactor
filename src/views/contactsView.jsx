@@ -3,16 +3,9 @@ import { Text, FlatList, ActivityIndicator } from 'react-native'
 import { View, Right, Body, List, ListItem, Left, Thumbnail, Icon, Separator, Input } from 'native-base'
 import { connect } from 'react-redux'
 
-class ContactsView extends Component {
-  constructor () {
-    super()
-    this.state = {
-      isLoading: false,
-      contactsDisplayed: [],
-      contacts: []
-    }
-  }
+import { loadContacts, updateFilter } from "../store/actions/contactActions";
 
+class ContactsView extends Component {
   static navigationOptions = {
     title: 'Home',
     headerTintColor: 'white',
@@ -21,20 +14,20 @@ class ContactsView extends Component {
     }
   }
 
-  componentDidMount () {
-    this.setState({ isLoading: true })
-    this.loadContacts()
+  async componentDidMount () {
+    const { dispatch } = this.props
+
+    await dispatch(loadContacts())
   }
 
-  loadContacts = async () => {
-    const { contacts } = this.props
-    this.setState({ contacts: contacts, contactsDisplayed: contacts, isLoading: false })
-  }
+  searchContacts = (filter) => {
+    const { dispatch } = this.props
 
-  searchContacts = filter => {
     const filteredContacts = this.state.contacts.filter(
       contact => (contact.name.toLowerCase()).indexOf(filter.toLowerCase()) > -1)
     this.setState({ contactsDisplayed: filteredContacts })
+
+    dispatch(filterList({ filter }))
   }
 
   renderItem = ({ item }) => {
@@ -47,7 +40,7 @@ class ContactsView extends Component {
           <Thumbnail source={{ uri: photo }} />
         </Left>
         <Body>
-          <Text>{id} {name}</Text>
+          <Text>{name}</Text>
         </Body>
         <Right>
           <Icon name="arrow-forward" />
@@ -65,10 +58,7 @@ class ContactsView extends Component {
   )
 
   render () {
-    console.log(this.state)
-    console.log(this.props)
-    const { navigation: { navigate } } = this.props
-    const { contactsDisplayed } = this.state
+    const { navigation: { navigate }, contacts } = this.props
 
     return (
       <List>
@@ -79,7 +69,8 @@ class ContactsView extends Component {
           <Body>
             <Input
               placeholder="Search"
-              onChangeText={value => this.searchContacts(value)}
+              value={this.props.filter}
+              onChangeText={(value) => this.props.dispatch(updateFilter(value))}
             />
           </Body>
         </ListItem>
@@ -94,9 +85,20 @@ class ContactsView extends Component {
             <Icon name="arrow-forward" />
           </Right>
         </ListItem>
-        <Separator bordered />
+        <ListItem icon onPress={() => null}>
+          <Left>
+            <Icon name="document" />
+          </Left>
+          <Body>
+            <Text>Import contacts</Text>
+          </Body>
+          <Right>
+            <Icon name="arrow-forward" />
+          </Right>
+        </ListItem>
+        <Separator bordered><Text>{this.props.filter}</Text></Separator>
         {
-          this.state.isLoading
+          this.props.isLoading
             ? (
                 <View>
                   <ActivityIndicator size="large" color="#bad555" />
@@ -104,9 +106,9 @@ class ContactsView extends Component {
               )
             : (
                 <FlatList
-                  data={contactsDisplayed}
+                  data={contacts}
                   renderItem={this.renderItem}
-                  keyExtractor={(item, index) => index.toString()}
+                  keyExtractor={(item, index) => item.id}
                   ListEmptyComponent={this.listEmptyComponent}
                 />
               )
@@ -116,9 +118,15 @@ class ContactsView extends Component {
   }
 }
 
+const getFilteredContacts = (contacts, filter) => {
+  return contacts.filter(contact => (contact.name.toLowerCase()).indexOf(filter.toLowerCase()) > -1).sort((a, b) => a.name.localeCompare(b.name))
+}
+
 const mapStateToProps = (state) => {
   return {
-    contacts: state.contactReducer.contactList
+    contacts: getFilteredContacts(state.contactReducer.contactList, state.contactReducer.filter),
+    filter: state.contactReducer.filter,
+    isLoading: state.contactReducer.isLoading
   }
 }
 
