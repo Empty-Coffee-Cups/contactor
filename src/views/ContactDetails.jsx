@@ -38,7 +38,7 @@ class ContactDetails extends Component {
 
   render () {
     const { navigation: { getParam } } = this.props
-    const { id, name, photo } = getParam('contact')
+    const { id, name, photo, phoneNumber } = getParam('contact')
 
     return (
       <Container>
@@ -65,7 +65,7 @@ class ContactDetails extends Component {
                 <Input placeholder={getParam('telephone')} style={styles.input} onChangeText={text => this.changeValue('phoneNumber',text)}/>
             </View>
             <View style={styles.item}>
-              <Button success large onPress={() => Linking.openURL(`tel:${getParam('telephone')}`)} >
+              <Button success large onPress={() => Linking.openURL(`tel:${getParam('phoneNumber')}`)} >
                 <Text>
                   Call
                 </Text>
